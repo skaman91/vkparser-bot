@@ -279,7 +279,7 @@ export default class BotLogic {
   }
 
   async parseAndPostToMyGroup () {
-    console.log('🚀 Начинаем автоматический парсинг и публикацию')
+    // console.log('🚀 Начинаем автоматический парсинг и публикацию')
     const jobToken = process.env.TOKEN_VK_API // токен для публикации
 
     for (const group of targetGroups) {
@@ -298,7 +298,7 @@ export default class BotLogic {
 
         const lastSavedId = await this.getLastPostId(group.domain)
 
-        const blacklist = ['такси', 'скидка', 'купон', 'промокод']
+        const blacklist = ['такси', 'скидка', 'купон', 'промокод', 'скидки', 'акция', 'акции', 'вступайте']
 
         for (const post of items.reverse()) { // от старого к новому
           const text = post.text?.trim()
@@ -308,8 +308,7 @@ export default class BotLogic {
 
           // Пропустить, если текст содержит одно из "запрещённых" слов
           const lowerText = text.toLowerCase()
-          if (blacklist.some(word => lowerText.includes(word))) {
-            console.log(`⛔ Пропущен пост ID ${post.id} — содержит запрещённые слова. Текст поста: ${text}`)
+          if (blacklist.some(word => lowerText.includes(word)) || /^https?:\/\/\S+$/i.test(lowerText)) {
             continue
           }
 
@@ -323,7 +322,7 @@ export default class BotLogic {
                 v: '5.199'
               }
             })
-            console.log(`✅ Опубликован пост ID ${post.id} из ${group.domain}`)
+            // console.log(`✅ Опубликован пост ID ${post.id} из ${group.domain}`)
             await this.setLastPostId(group.domain, post.id)
             await this.delay(15000) // между постами ждем 15 сек
           }
